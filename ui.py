@@ -13,7 +13,7 @@ class TriviaInterface:
         self.window.config(pady=20, padx=20, background=THEME_COLOR)
 
         # Create a label widget
-        self.score_label = Label(self.window, text="Score:0", background=THEME_COLOR)
+        self.score_label = Label(self.window, text=f"Score:{self.quiz.score}", background=THEME_COLOR)
         self.score_label.grid(column=1, row=0)
 
         # Create a canvas where the questions will show up
@@ -37,11 +37,31 @@ class TriviaInterface:
         self.window.mainloop()
 
     def get_next_question(self):
-        q_text = self.quiz.next_question()
-        self.canvas.itemconfig(self.question_text, text=q_text)
+        self.canvas.config(bg='white')
+
+        if self.quiz.still_has_questions():
+            q_text = self.quiz.next_question()
+            self.canvas.itemconfig(self.question_text, text=q_text)
+        else:
+            self.canvas.itemconfig(self.question_text, text=f"Thanks for playing. "
+                                                            f"You got {self.quiz.score}/5 questions right.")
+
+            self.true_button.config(state="disabled")
+            self.false_button.config(state="disabled")
 
     def true_pressed(self):
-        self.quiz.check_answer("True")
+        is_right = self.quiz.check_answer('True')
+        self.give_feedback(is_right)
 
     def false_pressed(self):
-        self.quiz.check_answer("False")
+        is_right = self.quiz.check_answer('False')
+        self.give_feedback(is_right)
+
+    def give_feedback(self, is_right):
+        if is_right:
+            self.canvas.config(bg='green')
+            self.score_label.config(text=f"Score: {self.quiz.score}")
+
+        else:
+            self.canvas.config(bg='red')
+        self.window.after(100, self.get_next_question)

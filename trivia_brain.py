@@ -27,13 +27,16 @@ class TriviaBrain:
 
     def next_question(self):
         self.current_question = self.question_list[self.question_number]
+        q_text = html.unescape(self.current_question['question'])
         self.question_number += 1
-        q_text = self.current_question['question']
         return f"Q{self.question_number}:{q_text}"
 
     def check_answer(self, user_answer):
-        if user_answer == self.question_list[self.question_number]['correct_answer']:
+        if user_answer == self.current_question['correct_answer']:
             self.score += 1
-            print("You got it right!")
+            return True
         else:
-            print("That's wrong.")
+            return False
+
+    def still_has_questions(self):
+        return self.question_number < len(self.question_list)
